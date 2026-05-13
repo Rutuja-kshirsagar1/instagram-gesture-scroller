@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>GestureCam</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@700;800&display=swap');
+
+    :root {
+      --bg: #0a0a0a;
+      --surface: #111;
+      --border: #222;
+      --accent: #00ff88;
+      --accent2: #ff3c6f;
+      --text: #e8e8e8;
+      --muted: #555;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      width: 280px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      padding: 16px;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      font-family: 'Syne', sans-serif;
+      font-size: 14px;
+      font-weight: 800;
+    }
+    .logo span { color: var(--accent); }
+
+    .pill {
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 10px;
+      border: 1px solid var(--muted);
+      color: var(--muted);
+    }
+    .pill.on { border-color: var(--accent); color: var(--accent); }
+
+    .stat-block {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px 12px;
+      margin-bottom: 10px;
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 4px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .stat-row:last-child { border-bottom: none; }
+    .stat-label { color: var(--muted); }
+    .stat-val { font-weight: 600; }
+    .green { color: var(--accent); }
+    .red { color: var(--accent2); }
+
+    .gesture-display {
+      text-align: center;
+      padding: 14px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      margin-bottom: 10px;
+    }
+    .gesture-icon { font-size: 28px; margin-bottom: 4px; }
+    .gesture-name { font-family: 'Syne', sans-serif; font-size: 13px; color: var(--accent); }
+    .gesture-sub { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+    .btn-row { display: flex; gap: 8px; margin-bottom: 10px; }
+
+    .btn {
+      flex: 1;
+      background: var(--accent);
+      color: #000;
+      border: none;
+      padding: 8px;
+      border-radius: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .btn:hover { opacity: 0.85; }
+    .btn.secondary {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+    .btn.danger { background: var(--accent2); }
+
+    .open-page-btn {
+      width: 100%;
+      background: transparent;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      padding: 8px;
+      border-radius: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-bottom: 10px;
+    }
+    .open-page-btn:hover { background: rgba(0,255,136,0.1); }
+
+    .ext-id-section { margin-top: 4px; }
+    .ext-id-label { color: var(--muted); font-size: 10px; margin-bottom: 4px; }
+    .ext-id-val {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 5px 8px;
+      font-size: 9px;
+      color: var(--muted);
+      word-break: break-all;
+      cursor: pointer;
+    }
+    .ext-id-val:hover { border-color: var(--accent); color: var(--text); }
+    .ext-id-val::after { content: ' (click to copy)'; font-size: 8px; color: var(--muted); }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">GESTURE<span>CAM</span></div>
+  <div class="pill" id="status-pill">● OFF</div>
+</header>
+
+<!-- Gesture display -->
+<div class="gesture-display">
+  <div class="gesture-icon" id="popup-gesture-icon">🤚</div>
+  <div class="gesture-name" id="popup-gesture-name">No Gesture</div>
+  <div class="gesture-sub" id="popup-gesture-sub">Open the detection page to start</div>
+</div>
+
+<!-- Stats -->
+<div class="stat-block">
+  <div class="stat-row">
+    <span class="stat-label">Scrolling</span>
+    <span class="stat-val" id="popup-scrolling">Enabled</span>
+  </div>
+  <div class="stat-row">
+    <span class="stat-label">Last Gesture</span>
+    <span class="stat-val" id="popup-last-gesture">—</span>
+  </div>
+</div>
+
+<!-- Controls -->
+<div class="btn-row">
+  <button class="btn" id="btn-toggle">Pause</button>
+  <button class="btn secondary" id="btn-ig">Open Reels</button>
+</div>
+
+<!-- Open detection page -->
+<button class="open-page-btn" id="btn-open-detect">
+  📷 Open Detection Page
+</button>
+
+<!-- Extension ID (for configuring the detection page) -->
+<div class="ext-id-section">
+  <div class="ext-id-label">Your Extension ID (copy to detection page):</div>
+  <div class="ext-id-val" id="ext-id-display">Loading…</div>
+</div>
+
+<script src="popup.js"></script>
+</body>
+</html>
