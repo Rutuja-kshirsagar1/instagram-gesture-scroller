@@ -71,6 +71,7 @@ chrome-extension/
 6. Show a **fist** → Instagram should scroll UP to previous reel
 7. Show a **peace sign** → Scrolling pauses (show again to resume)
 
+## note
 The Chrome extension currently does not work properly. The popup opens and the detection page runs successfully, but Instagram Reels do not scroll due to browser security restrictions.
 
 If you would like to contribute or improve the extension, feel free to do so.
